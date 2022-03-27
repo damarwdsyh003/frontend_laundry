@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css?family=Trirong');
+.login{
+    padding: 130px 0px 30px 0px;
+}
+.login input{
+    border-radius: 15px;
+}
+.login .card{
+    background-color: #9ADCFF !important;
+}
+.dashboard-page .hello h2{
+    font-size: 50px;
+    font-weight: 700;
+    font-family: 'Source Sans Pro', sans-serif;
+    background: -webkit-linear-gradient(#4a8189, #629ba7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+}
+
+.dashboard-page .hello .btn{
+    border: none;
+    border-radius: 50px;
+}
+.dashboard-page .hello h1{
+    margin-top: 100px;
+}
+.dashboard-page .summary i{
+    font-size: 36px;
+}
+.dashboard-page .summary .card{
+    border: none;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px 0px rgb(0 0 0 / 20%);
+
+}
