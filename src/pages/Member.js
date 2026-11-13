@@ -92,7 +92,7 @@ class Member extends React.Component {
                 .catch((error) => console.log(error));
         } else if (this.state.action === "ubah") {
             this.modalMember.hide();
-            let endpoint = `${baseUrl}/member` + this.state.id_member;
+            let endpoint = `${baseUrl}/member/` + this.state.id_member;
             let newMember = {
                 id_member: this.state.id_member,
                 nama: this.state.nama,

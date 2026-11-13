@@ -32,7 +32,7 @@ export default class FormTransaksi extends React.Component {
             //menghapus data pada array
             temp.splice(index, 1)
 
-            this.setState({ members: temp })
+            this.setState({ detail_transaksi: temp })
         }
 
     }
@@ -118,7 +118,7 @@ export default class FormTransaksi extends React.Component {
             tgl: this.state.tgl,
             tgl_bayar: this.state.tgl_bayar,
             dibayar: this.state.dibayar,
-            id_user: this.state.user,
+            id_user: user.id_user,
             detail_transaksi: this.state.detail_transaksi,
         };
 

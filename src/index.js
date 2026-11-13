@@ -7,18 +7,9 @@ import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap/dist/js/bootstrap.bundle"
 
-import Transaksi from './pages/Transaksi';
-import NotFound from './notfound';
-import Member from "./pages/Member"
-import Paket from './pages/Paket';
-import Users from './pages/Users';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-
-
 ReactDOM.render(
   <React.StrictMode>
-    <Login />
+    <App />
   </React.StrictMode>,
   document.getElementById('root')
 );

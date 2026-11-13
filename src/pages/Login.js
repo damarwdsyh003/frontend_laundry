@@ -16,7 +16,7 @@ class Login extends React.Component {
 
     loginProcess(event) {
         event.preventDefault()
-        const url = baseUrl + "/login"
+        const url = baseUrl + "/auth"
         let request = {
             username: this.state.username,
             password: this.state.password,
@@ -30,13 +30,16 @@ class Login extends React.Component {
                     // store token in local storage
                     localStorage.setItem("token", result.data.token)
                     localStorage.setItem("user", JSON.stringify(result.data.user))
-                    window.alert("Mantap!")
                     window.location.href = "/member"
                 } else {
-                    window.alert("Maaf, tidak valid !")
+                    window.alert(result.data.message || "Username atau password tidak valid.")
                 }
             })
-            .catch(error => console.log(error))
+            .catch(error => {
+                window.alert(
+                    error.response?.data?.message || "Login gagal. Pastikan backend sedang berjalan."
+                )
+            })
     }
 
     render() {
