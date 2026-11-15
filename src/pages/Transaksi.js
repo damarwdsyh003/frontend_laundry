@@ -7,70 +7,89 @@ class Transaksi extends React.Component {
         super();
         this.state = {
             transaksi: [],
+            loading: true,
+            error: "",
         };
+        if (!localStorage.getItem("token")) {
+            window.location.href = "/login";
+        }
     }
     getData() {
         let endpoint = `${baseUrl}/transaksi`;
         axios
             .get(endpoint, authorization)
             .then((response) => {
-                let dataTransaksi = response.data;
-                for (let i = 0; i < dataTransaksi.length; i++) {
-                    let total = 0;
-                    for (let j = 0; j < dataTransaksi[i].detail_transaksi.length; j++) {
-                        let harga = dataTransaksi[i].detail_transaksi[j].paket.harga;
-                        let qty = dataTransaksi[i].detail_transaksi[j].qty;
-
-                        total += (harga * qty);
-                    }
-
-                    //tambah key "total"
-                    dataTransaksi[i].total = total;
+                if (!Array.isArray(response.data)) {
+                    throw new Error("The transaction response is not a list");
                 }
-                this.setState({ transaksi: dataTransaksi });
+
+                const dataTransaksi = response.data.map((transaction) => {
+                    const details = Array.isArray(transaction.detail_transaksi)
+                        ? transaction.detail_transaksi
+                        : [];
+                    const total = details.reduce((sum, detail) => {
+                        const harga = Number(detail.paket?.harga || 0);
+                        return sum + (harga * Number(detail.qty || 0));
+                    }, 0);
+
+                    return { ...transaction, detail_transaksi: details, total };
+                });
+
+                this.setState({ transaksi: dataTransaksi, loading: false, error: "" });
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {
+                if (error.response?.status === 401) {
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                this.setState({
+                    loading: false,
+                    error: error.response?.data?.message || "Unable to load transactions. Check that the backend is running."
+                });
+            });
     }
     convertStatus(id_transaksi, status) {
         if (status === 1) {
             return (
-                <div className="badge bg-secondary"><i class='far fa-clock'></i> Transaksi Baru
-                    <br />
-                    <br />
-                    <button type="submit"
+                <div className="transaction-status status-new">
+                    <span><i className="far fa-clock"></i> Transaksi Baru</span>
+                    <button type="button"
                         onClick={() => this.changeStatus(id_transaksi, 2)}
-                        className="btn btn-sm btn-outline-light"
-                    ><i class='far fa-caret-square-up'></i> update status
+                        className="status-action"
+                    >Update status
                     </button>
                 </div>
             );
         } else if (status === 2) {
             return (
-                <div className="badge bg-warning"> <i class='far fa-hourglass'></i> Sedang Diproses
-                    <br />
-                    <br />
-                    <button
+                <div className="transaction-status status-processing">
+                    <span><i className="far fa-hourglass"></i> Sedang Diproses</span>
+                    <button type="button"
                         onClick={() => this.changeStatus(id_transaksi, 3)}
-                        className="btn btn-sm btn-outline-light"
-                    ><i class='far fa-caret-square-up'></i> update status
+                        className="status-action"
+                    >Update status
                     </button>
                 </div>
             );
         } else if (status === 3) {
             return (
-                <div className="badge bg-danger"> <i class='fas fa-external-link-alt'></i> Siap Diambil
-                    <br />
-                    <br />
-                    <button type="submit"
+                <div className="transaction-status status-ready">
+                    <span><i className="fas fa-external-link-alt"></i> Siap Diambil</span>
+                    <button type="button"
                         onClick={() => this.changeStatus(id_transaksi, 4)}
-                        className="btn btn-sm btn-outline-light"
-                    ><i class='far fa-caret-square-up'></i> update status
+                        className="status-action"
+                    >Update status
                     </button>
                 </div>
             );
         } else if (status === 4) {
             return (
-                <div className="badge bg-success"> <i class='far fa-calendar-check'></i> Sudah Diambil</div>
+                <div className="transaction-status status-complete">
+                    <span><i className="far fa-calendar-check"></i> Sudah Diambil</span>
+                </div>
             )
         }
 
@@ -104,20 +123,17 @@ class Transaksi extends React.Component {
     convertStatusBayar(id_transaksi, dibayar) {
         if (dibayar == 0) {
             return (
-                <div className="badge bg-danger text-white">
-                    Belum Dibayar
-                    <br />
-                    <br />
-                    <div> </div>
-                    <button type="submit"
-                        className="btn btn-sm btn-outline-light"
+                <div className="transaction-status payment-unpaid">
+                    <span>Belum Dibayar</span>
+                    <button type="button"
+                        className="status-action"
                         onClick={() => this.changeStatusBayar(id_transaksi, 1)}
-                    ><i class='far fa-caret-square-up'></i> update pembayaran
+                    >Tandai dibayar
                     </button>
                 </div>
             );
         } else if (dibayar == 1) {
-            return <div className="badge bg-success text-white"> <i class='far fa-calendar-check'></i> Sudah Dibayar </div>;
+            return <div className="transaction-status payment-paid"><span><i className="far fa-calendar-check"></i> Sudah Dibayar</span></div>;
         }
     }
     changeStatusBayar(id, status) {
@@ -148,7 +164,7 @@ class Transaksi extends React.Component {
     render() {
         return (
 
-            <div className="container">
+            <div className="container catalog-page">
                 <div className="card">
                     <div className="card-header bg-dark">
                         <h4 className="text-white" align="center">
@@ -156,7 +172,12 @@ class Transaksi extends React.Component {
                         </h4>
                     </div>
                     <div className="card-body">
-                        <ul className="list-group">
+                        {this.state.loading && <div className="page-state">Loading transactions...</div>}
+                        {this.state.error && <div className="form-alert">{this.state.error}</div>}
+                        {!this.state.loading && !this.state.error && this.state.transaksi.length === 0 && (
+                            <div className="page-state">No transactions have been recorded yet.</div>
+                        )}
+                        {!this.state.error && <ul className="list-group">
                             {this.state.transaksi.map(trans => (
                                 <li className="list-group-item">
                                     <div className="row">
@@ -165,7 +186,15 @@ class Transaksi extends React.Component {
                                             <small className="text-primary">
                                                 Member
                                             </small> <br />
-                                            {trans.member.nama}
+                                            {trans.member?.nama || "Member unavailable"}
+                                        </div>
+
+                                        {/* Area Status */}
+                                        <div className="col-lg-3">
+                                            <small className="text-primary">
+                                                Status
+                                            </small> <br />
+                                            {this.convertStatus(trans.id_transaksi, trans.status)}
                                         </div>
 
                                         {/* Area Tanggal Transaksi */}
@@ -192,13 +221,6 @@ class Transaksi extends React.Component {
                                             {trans.tgl_bayar}
                                         </div>
 
-                                        {/* Area Status */}
-                                        <div className="col-lg-3">
-                                            <small className="text-primary">
-                                                Status
-                                            </small> <br />
-                                            {this.convertStatus(trans.id_transaksi, trans.status)}
-                                        </div>
                                         {/* Status Pembayaran Area */}
                                         <div className="col-lg-3">
                                             <small className="text-primary">Status Pembayaran</small>{" "}
@@ -228,7 +250,7 @@ class Transaksi extends React.Component {
                                                 <div className="row">
                                                     {/* area nama paket col-3 */}
                                                     <div className="col-lg-3">
-                                                        {detail.paket.jenis_paket}
+                                                        {detail.paket?.jenis_paket || "Package unavailable"}
                                                     </div>
                                                     {/* area quantity col-2 */}
                                                     <div className="col-lg-2">
@@ -236,11 +258,11 @@ class Transaksi extends React.Component {
                                                     </div>
                                                     {/* area harga paket col-3 */}
                                                     <div className="col-lg-3">
-                                                        <b> @ </b> Rp. {formatNumber(detail.paket.harga)}
+                                                        <b> @ </b> Rp. {formatNumber(detail.paket?.harga || 0)}
                                                     </div>
                                                     {/* area harga total col-4 */}
                                                     <div className="col-lg-4">
-                                                        Rp. {formatNumber(detail.paket.harga * detail.qty)}
+                                                        Rp. {formatNumber((detail.paket?.harga || 0) * detail.qty)}
                                                     </div>
                                                 </div>
                                             ))}
@@ -248,7 +270,7 @@ class Transaksi extends React.Component {
                                     </div>
                                 </li>
                             ))}
-                        </ul>
+                        </ul>}
                     </div>
                 </div>
             </div>

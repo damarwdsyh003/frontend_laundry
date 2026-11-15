@@ -1,14 +1,13 @@
 import React from "react";
-import NotFound from "./notfound";
 import Member from "./pages/Member";
 import Paket from "./pages/Paket";
 import Users from "./pages/Users";
 import FormTransaksi from "./pages/FormTransaksi";
 import Login from "./pages/Login";
-import header from "./header";
 import Navbar from "./components/Navbar";
-import  Footer from "./footer";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
+import Register from "./pages/Register";
 import { BrowserRouter, Route, Routes, } from "react-router-dom";
 import Transaksi from "./pages/Transaksi";
 import './style.css'
@@ -18,8 +17,10 @@ export default function App() {
   return (
     <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navbar> <Dashboard /> </Navbar>} />
+          <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login/>} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<Navbar> <Dashboard /> </Navbar>} />
           <Route path="/member" element={<Navbar> <Member /> </Navbar> } />
           <Route path="/paket" element={<Navbar> <Paket />  </Navbar>} />
           <Route path="/users" element={<Navbar> <Users /> </Navbar> } />

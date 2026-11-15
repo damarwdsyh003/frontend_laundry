@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import logo from "./logo.png";
 
 function Logout() {
   //remove data token dan user local storage
@@ -15,8 +14,10 @@ export default function Navbar(props) {
 
         <div className="container">
           {/* brand */}
-          <a href="/" className="navbar-brand">
-          <img src={logo} class="img" width="50" /></a>
+          <Link to="/dashboard" className="navbar-brand">
+            <span className="brand-icon">✦</span>
+            <span>FreshFold</span>
+          </Link>
 
           {/* button toggler */}
           <button
@@ -30,8 +31,8 @@ export default function Navbar(props) {
           <div className="collapse navbar-collapse" id="myNav">
             <ul className="navbar-nav me-auto mt-2 nt-lg-0">
             <li className="nav-item">
-                <Link to="/" className="nav-link">
-                  Home
+                <Link to="/dashboard" className="nav-link">
+                  Overview
                 </Link>
               </li>
               <li className="nav-item">
@@ -60,8 +61,8 @@ export default function Navbar(props) {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link to="/login" className="nav-link" onClick={() => Logout()}>
-                  Logout
+                <Link to="/login" className="nav-link nav-logout" onClick={() => Logout()}>
+                  Sign out
                 </Link>
               </li>
             </ul>

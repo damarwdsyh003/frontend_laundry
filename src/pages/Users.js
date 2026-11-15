@@ -20,7 +20,7 @@ class Users extends React.Component {
   }
   tambahData() {
     //memunculkan modal
-    this.modalUser = new Modal(document.getElementById("modal-user"));
+    this.modalUser = new Modal(document.getElementById("modal_users"));
     this.modalUser.show();
 
     //mengosongkan inputannya
@@ -63,7 +63,7 @@ class Users extends React.Component {
           window.alert(response.data.message);
           this.getData();
         })
-        .catch((error) => console.log(error));
+        .catch((error) => window.alert(error.response?.data?.message || "User gagal ditambahkan."));
     } else if (this.state.action === "ubah") {
       this.modalUser.hide();
       let endpoint = `${baseUrl}/users/` + this.state.id_user;
@@ -80,7 +80,7 @@ class Users extends React.Component {
           window.alert(response.data.message);
           this.getData();
         })
-        .catch((error) => console.log(error));
+        .catch((error) => window.alert(error.response?.data?.message || "User gagal diubah."));
 
       //mencari posisi index dari data member
       //berdasarkan id member nya pada array "members"
@@ -100,7 +100,7 @@ class Users extends React.Component {
   }
 
   ubahData(id_user) {
-    this.modalUser = new Modal(document.getElementById("modal-user"));
+    this.modalUser = new Modal(document.getElementById("modal_users"));
     this.modalUser.show();
 
     //mencari posisi index dari data user
@@ -187,7 +187,7 @@ showAddButton() {
 
     render(){
         return (
-            <div className="container">
+            <div className="container catalog-page">
                 <div className="card">
                     <div className="card-header bg-dark">
                         <h3 className="text-white" align="center">
@@ -215,12 +215,12 @@ showAddButton() {
                                         <div className="col-lg-1">
                                             <div className="d-grid gap-2">
                                                 <button className="btn btn-sm btn-warning"
-                                                    onClick={() => this.ubahData(user.id_users)}>
+                                                    onClick={() => this.ubahData(user.id_user)}>
                                                     Edit
                                                 </button>
 
                                                 <button className="btn btn-sm btn-danger"
-                                                    onClick={() => this.hapusData(user.id_users)}>
+                                                    onClick={() => this.hapusData(user.id_user)}>
                                                     Hapus
                                                 </button>
                                             </div>
@@ -262,6 +262,9 @@ showAddButton() {
                                     <option value="Kasir">Kasir</option>
                                     <option value="Member">Member</option>
                                 </select>
+                                <small className="text-muted d-block mb-3">
+                                    Login roles are separate from customer records. Add laundry customers from the Member page.
+                                </small>
 
 
                                 <button className="btn btn-success">

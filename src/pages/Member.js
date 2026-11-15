@@ -46,7 +46,7 @@ class Member extends React.Component {
     }
     tambahData() {
         //memunculkan modal
-        this.modalMember = new Modal(document.getElementById("modal-member"));
+        this.modalMember = new Modal(document.getElementById("modal_member"));
         this.modalMember.show();
 
         //mengosongkan inputannya
@@ -89,7 +89,7 @@ class Member extends React.Component {
                     window.alert(response.data.message);
                     this.getData();
                 })
-                .catch((error) => console.log(error));
+                .catch((error) => window.alert(error.response?.data?.message || "Data member gagal ditambahkan."));
         } else if (this.state.action === "ubah") {
             this.modalMember.hide();
             let endpoint = `${baseUrl}/member/` + this.state.id_member;
@@ -126,7 +126,7 @@ class Member extends React.Component {
     }
 
     ubahData(id_member) {
-        this.modalMember = new Modal(document.getElementById("modal-member"));
+        this.modalMember = new Modal(document.getElementById("modal_member"));
         this.modalMember.show();
 
         //mencari posisi index dari data member
@@ -216,7 +216,7 @@ class Member extends React.Component {
 
     render() {
         return (
-            <div className="container">
+            <div className="container catalog-page">
                 <div className="card">
                     <div className="card-header bg-dark">
                         <h3 className="text-white" align="center">

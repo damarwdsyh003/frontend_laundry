@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
 import { baseUrl, formatNumber, authorization } from "../config";
-import gambar from "./laundry-1.png";
 
 
 export default class Dashboard extends React.Component {
@@ -70,81 +69,40 @@ export default class Dashboard extends React.Component {
   }
 
   render() {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const entries = [
+      { number: "01", label: "Members", value: this.state.jmlMember, note: "registered customers", icon: "♧" },
+      { number: "02", label: "Packages", value: this.state.jmlPaket, note: "services in your menu", icon: "◈" },
+      { number: "03", label: "Transactions", value: this.state.jmlTransaksi, note: "orders in the log", icon: "⌁" },
+      { number: "04", label: "Income", value: `Rp ${formatNumber(this.state.income)}`, note: "total recorded income", icon: "↗" },
+    ];
+
     return (
-      <div className="container dashboard-page"><br/>
-        <div className="row">
-          <div className="col-lg-12">
-            <div className="hello">
-              <div className="row">
-              </div>
-            </div>
-            <div className="row summary">
-              <div className="col-lg-3 col-md-6">
-                <div className="card">
-                  <div className="row">
-                    <h4 className="card-title" align="center">Data Member</h4>
-                    <h2 align="center">{this.state.jmlMember}</h2>
-                  </div>
-                </div>
-              </div><span /><br />
-              <div className="col-lg-3 col-md-6">
-                <div className="card">
-                  <div className="row">
-                    {/* <div className="col-lg-4">
-                      <i class="fa-solid fa-box-open bg-warning p-4 text-white"></i>
-                    </div> */}
-                    {/* <div className="col-lg-7"> */}
-                    <h4 className="card-title" align="center">Data Paket</h4>
-                    <h2 align="center">{this.state.jmlPaket}</h2>
-                    {/* </div> */}
-                  </div>
-                </div>
-              </div><span /><br />
-              <div className="col-lg-3 col-md-6">
-                <div className="card">
-                  <div className="row">
-                    {/* <div className="col-lg-4">
-                      <i class="fa-solid fa-bag-shopping bg-success p-4 text-white"></i>
-                    </div> */}
-                    {/* <div className="col-lg-7"> */}
-                    <h4 className="card-title" align="center">Data Transaksi</h4>
-                    <h2 align="center">{this.state.jmlTransaksi}</h2>
-                    {/* </div> */}
-                  </div>
-                </div>
-              </div><span /><br />
-              <div className="col-lg-3 col-md-6">
-                <div className="card">
-                  <div className="row">
-                    {/* <div className="col-lg-4">
-                      <i class="fa-solid fa-bag-shopping bg-success p-4 text-white"></i>
-                    </div> */}
-                    {/* <div className="col-lg-7"> */}
-                    <h4 className="card-title" align="center">Income</h4>
-                    <h2 align="center">Rp {formatNumber(this.state.income)}</h2>
-                    {/* </div> */}
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div className="container dashboard-page catalog-dashboard">
+        <div className="catalog-heading">
+          <div>
+            <span className="eyebrow">FreshFold / Daily catalog</span>
+            <h1>Good morning, {user.nama || "there"}.</h1>
+            <p>A considered view of everything moving through your laundry.</p>
           </div>
-          {/* <div className="row summary">
-            <div className="col-lg-12">
-              <div className="card">
-
-                <div className="col-lg-4">
-                  <i class="fa-solid fa-chart-line bg-primary p-4 text-white "></i>
-                </div>
-                <div className="col-lg-7">
-                  <h4 className="card-title" align="center">Income</h4>
-                  <h2>Rp {formatNumber(this.state.income)}</h2>
-                </div>
-              </div>
-            </div>
-          </div> */}
+          <div className="catalog-edition"><span>EDITION</span><strong>11.15</strong><small>LIVE BOARD</small></div>
         </div>
+        <div className="catalog-rule"><span>01</span><strong>AT A GLANCE</strong><span>THE WORK IN NUMBERS</span></div>
+        <div className="catalog-grid">
+          {entries.map((entry) => (
+            <article className="catalog-entry" key={entry.number}>
+              <div className="catalog-entry-top"><span>{entry.number}</span><b>{entry.icon}</b></div>
+              <div className="catalog-entry-body">
+                <p>{entry.label}</p>
+                <h2>{entry.value}</h2>
+                <small>{entry.note}</small>
+              </div>
+              <div className="catalog-entry-arrow">↗</div>
+            </article>
+          ))}
+        </div>
+        <div className="catalog-footer"><span>FreshFold operations catalog</span><span>Keep the day moving →</span></div>
       </div>
-
     );
   }
 }

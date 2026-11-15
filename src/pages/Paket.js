@@ -1,5 +1,7 @@
 import React from "react"
 import { Modal } from "bootstrap";
+import axios from "axios";
+import { baseUrl, authorization } from "../config";
 class Paket extends React.Component {
     constructor() {
         super()
@@ -7,18 +9,18 @@ class Paket extends React.Component {
             id_paket: Math.random(1, 1000000),
             jenis_paket: "",
             harga: "",
-            paket: [
-                {
-                    id_paket: "1", jenis_paket: "Cuci Setrika", harga: "20000"
-                },
-                {
-                    id_paket: "2", jenis_paket: "Cuci", harga: "10000"
-                },
-                {
-                    id_paket: "3", jenis_paket: "Setrika", harga: "10000"
-                }
-            ]
+            paket: []
         }
+    }
+
+    getData() {
+        axios.get(`${baseUrl}/paket`, authorization)
+            .then(response => this.setState({ paket: response.data }))
+            .catch(error => window.alert(error.response?.data?.message || "Paket gagal dimuat."));
+    }
+
+    componentDidMount() {
+        this.getData();
     }
 
     tambahData() {
@@ -36,28 +38,21 @@ class Paket extends React.Component {
     simpanData(event) {
         event.preventDefault();
 
-        if (this.state.action === "tambah") {
-            let data = {
-                jenis_paket: this.state.jenis_paket,
-                harga: this.state.harga,
-                id_paket: this.state.id_paket,
-            }
-            let temp = this.state.paket
-            temp.push(data)
-            this.setState({ paket: temp })
-
-            this.modalPaket.hide()
-        } else if (this.state.action === "ubah") {
-            let temp = this.state.paket
-            let index = temp.findIndex(
-                paket => paket.id_paket === this.state.id_paket
-            )
-
-            temp[index].jenis_paket = this.state.jenis_paket
-            temp[index].harga = this.state.harga
-
-            this.setState({ paket: temp })
+        const data = {
+            jenis_paket: this.state.jenis_paket,
+            harga: this.state.harga,
         }
+        const request = this.state.action === "tambah"
+            ? axios.post(`${baseUrl}/paket`, data, authorization)
+            : axios.put(`${baseUrl}/paket/${this.state.id_paket}`, data, authorization)
+
+        request
+            .then(response => {
+                this.modalPaket.hide()
+                window.alert(response.data.message)
+                this.getData()
+            })
+            .catch(error => window.alert(error.response?.data?.message || "Paket gagal disimpan."))
     }
 
     ubahData(id_paket) {
@@ -78,18 +73,18 @@ class Paket extends React.Component {
 
     hapusData(id_paket) {
         if (window.confirm("Apakah anda yakin ingin menghapus data ini?")) {
-            let temp = this.state.paket
-            let index = temp.findIndex(paket => paket.id_paket === id_paket)
-            
-            temp.splice(index, 1)
-
-            this.setState({ paket: temp })
+            axios.delete(`${baseUrl}/paket/${id_paket}`, authorization)
+                .then(response => {
+                    window.alert(response.data.message)
+                    this.getData()
+                })
+                .catch(error => window.alert(error.response?.data?.message || "Paket gagal dihapus."))
         }
     }
 
     render() {
         return (
-            <div className="container">
+            <div className="container catalog-page">
                 <div className="card">
                     <div className="card-header bg-dark">
                         <h3 className="text-white" align="center">

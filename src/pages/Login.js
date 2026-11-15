@@ -1,10 +1,9 @@
 import React from "react"
 import axios from "axios" //Lib untuk membantu membuat request ke backend
 import { baseUrl } from "../config";
-import { Link } from "react-router-dom";
-import App from "../App";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-class Login extends React.Component {
+class LoginForm extends React.Component {
     constructor() {
         super()
         this.state = {
@@ -30,7 +29,7 @@ class Login extends React.Component {
                     // store token in local storage
                     localStorage.setItem("token", result.data.token)
                     localStorage.setItem("user", JSON.stringify(result.data.user))
-                    window.location.href = "/member"
+                    window.location.href = "/dashboard"
                 } else {
                     window.alert(result.data.message || "Username atau password tidak valid.")
                 }
@@ -44,45 +43,36 @@ class Login extends React.Component {
 
     render() {
         return (
-            <div className="container"> <br /> <br /> <br /> <br /> <br /> 
-                <div className="col-lg-4" style={{ margin: "0 auto" }}>
-                    <div className="card border-dark mb-3" >
-                        <div className="card-header bg-dark">
-                            <h4 className="text-center text-white">LOGIN</h4>
-                            <ul class="nav nav-tabs card-header-tabs">
-                            </ul>
+            <main className="auth-page">
+                <div className="auth-decoration auth-decoration-one" />
+                <div className="auth-decoration auth-decoration-two" />
+                <div className="auth-shell">
+                    <Link to="/" className="brand-mark auth-brand"><span className="brand-icon">✦</span>FreshFold</Link>
+                    <div className="auth-card">
+                        <div className="auth-heading">
+                            <span className="eyebrow">Welcome back</span>
+                            <h1>Good to see you again.</h1>
+                            <p>Sign in to pick up where you left off.</p>
                         </div>
-                        <div className="card-body">
-
-                            <form onSubmit={ev => this.loginProcess(ev)}>
-
-                                {/* Username */}
-                                <i class="fa fa-user" aria-hidden="true"></i>
-                                <n />  <n />  <n /> <label>Username</label>
-                                <input type="text" className="form-control mb-2" placeholder="Username" required value={this.state.username}
-                                    onChange={ev => this.setState({ username: ev.target.value })} /> <i class='fas fa-lock'></i>
-
-                                {/* Password */}
-                                <n /> <label>Password</label>
-                                <input type="password" className="form-control mb-2" placeholder="••••••••••" required value={this.state.password}
-                                    onChange={ev => this.setState({ password: ev.target.value })} />
-
-                                {/* Role */}
-                                {/* <n /><label> Role </label>
-                                <select className="form-control mb-2" required value={this.state.role}
-                                    onChange={ev => this.setState({ role: ev.target.value })}>
-                                    <option value="user">Users</option>
-                                    <option value="kasir">Kasir</option>
-                                    <option value="admin">Admin</option>
-                                </select> */}
-                                <button type="submit" className="btn btn-my btn-outline-dark">Login</button>
-                            </form>
-                            <div></div>
-                        </div>
+                        <form onSubmit={ev => this.loginProcess(ev)}>
+                            <label htmlFor="login-username">Username</label>
+                            <input id="login-username" type="text" placeholder="Your username" required value={this.state.username} onChange={ev => this.setState({ username: ev.target.value })} />
+                            <label htmlFor="login-password">Password</label>
+                            <input id="login-password" type="password" placeholder="Your password" required value={this.state.password} onChange={ev => this.setState({ password: ev.target.value })} />
+                            <button type="submit" className="btn btn-primary btn-lg w-100">Sign in →</button>
+                        </form>
+                        <p className="auth-switch">New to FreshFold? <Link to="/register">Create an account</Link></p>
                     </div>
-                </div >
-            </div >
+                </div>
+            </main>
         )
     }
 }
+
+function Login() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    return <LoginForm location={location} navigate={navigate} />;
+}
+
 export default Login

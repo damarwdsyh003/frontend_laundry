@@ -11,7 +11,7 @@ export default class FormTransaksi extends React.Component {
             tgl: "",
             batas_waktu: "",
             tgl_bayar: "",
-            dibayar: false,
+            dibayar: 0,
             id_user: "",
             detail_transaksi: [],
             members: [],
@@ -64,7 +64,8 @@ export default class FormTransaksi extends React.Component {
         
     let user = JSON.parse(localStorage.getItem("user"));
 
-    if(user.role !== 'Admin' && user.role !== 'kasir') {
+    const role = String(user.role || "").toLowerCase();
+    if(role !== 'admin' && role !== 'kasir') {
       window.alert(
       `Maaf Anda tidak berhak untuk mengakses halaman ini`
       )
@@ -110,14 +111,23 @@ export default class FormTransaksi extends React.Component {
         })
     }
     simpanTransaksi() {
+        if (!this.state.id_member) {
+            window.alert("Pilih member terlebih dahulu.");
+            return;
+        }
+        if (this.state.detail_transaksi.length === 0) {
+            window.alert("Tambahkan minimal satu paket.");
+            return;
+        }
+
         let endpoint = `${baseUrl}/transaksi`;
         let user = JSON.parse(localStorage.getItem("user"));
         let newData = {
-            id_member: this.state.id_member,
+            id_member: Number(this.state.id_member),
             batas_waktu: this.state.batas_waktu,
             tgl: this.state.tgl,
             tgl_bayar: this.state.tgl_bayar,
-            dibayar: this.state.dibayar,
+            dibayar: Number(this.state.dibayar),
             id_user: user.id_user,
             detail_transaksi: this.state.detail_transaksi,
         };
@@ -132,7 +142,7 @@ export default class FormTransaksi extends React.Component {
 
     render() {
         return (
-            <div className="container">
+            <div className="container catalog-page">
                 <div className="card">
                     <div className="card-header bg-dark">
                         <h4 className="text-white" align="center">
@@ -144,6 +154,7 @@ export default class FormTransaksi extends React.Component {
                         <select className="form-control mb-2"
                             value={this.state.id_member}
                             onChange={e => this.setState({ id_member: e.target.value })}>
+                            <option value="">Pilih member</option>
                             {this.state.members.map(member => (
                                 <option value={member.id_member}>
                                     {member.nama}
@@ -169,64 +180,54 @@ export default class FormTransaksi extends React.Component {
                         Status Bayar
                         <select className="form-control mb-2"
                             value={this.state.dibayar}
-                            onChange={e => this.setState({ dibayar: e.target.value })}>
-                            <option value={true}>Sudah Dibayar</option>
-                            <option value={false}>Belum Dibayar</option>
+                            onChange={e => this.setState({ dibayar: Number(e.target.value) })}>
+                            <option value="1">Sudah Dibayar</option>
+                            <option value="0">Belum Dibayar</option>
                         </select>
 
-                        <div className="card">
-                            <div className="card-header bg-light">
-                                {/* tampil isi detai */}
+                        <div className="card transaction-detail-card">
+                            <div className="card-header">
                                 <h5>Detail Transaksi</h5>
+                                <span>{this.state.detail_transaksi.length} paket dipilih</span>
+                            </div>
+                            <div className="card-body">
+                                {this.state.detail_transaksi.length === 0 && (
+                                    <div className="page-state">Belum ada paket. Klik Tambah Paket untuk mulai.</div>
+                                )}
                                 {this.state.detail_transaksi.map(detail => (
-                                    <div className="row">
-                                        {/* area nama paket col-3 */}
-                                        <div className="col-lg-3">
-                                            <small className="text-dark"> Jenis </small> <br />
-                                            {detail.jenis_paket}
+                                    <div className="transaction-detail-row" key={detail.id_paket}>
+                                        <div>
+                                            <small>Jenis</small>
+                                            <strong>{detail.jenis_paket}</strong>
                                         </div>
-
-                                        {/* area quantity col-2 */}
-                                        <div className="col-lg-2">
-                                            <small className="text-dark"> Qty </small> <br />
-                                            Qty: {detail.qty}
+                                        <div>
+                                            <small>Qty</small>
+                                            <strong>{detail.qty}</strong>
                                         </div>
-
-                                        {/* area harga paket col-3 */}
-                                        <div className="col-lg-3">
-                                            <small className="text-dark"> Harga </small> <br />
-                                            @ Rp {detail.harga}
+                                        <div>
+                                            <small>Harga</small>
+                                            <strong>Rp {detail.harga}</strong>
                                         </div>
-
-                                        {/* area harga total col-4 */}
-                                        <div className="col-lg-3">
-                                            <small className="text-dark"> Total </small> <br />
-                                            Rp {detail.harga * detail.qty}
+                                        <div>
+                                            <small>Total</small>
+                                            <strong>Rp {detail.harga * detail.qty}</strong>
                                         </div>
-                                        <div className="col-lg-1">
-
-                                            <div className="d-grid gap-2">
-                                                <button className="btn btn-sm btn-outline-dark  "
-                                                    onClick={() => this.hapusData(detail.id_paket)}><i class="fas fa-trash"></i> Hapus
-                                                </button>
-
-                                                <button className="btn btn-sm btn-dark " type="submit"
-                                                    onClick={() => this.simpanTransaksi()}>
-                                                    Simpan
-                                                </button>
-
-                                                <br />
-                                            </div>
-                                        </div>
-                                        <br />
-                                        <hr />
+                                        <button className="btn btn-sm btn-outline-danger"
+                                            type="button"
+                                            onClick={() => this.hapusData(detail.id_paket)}>
+                                            Hapus
+                                        </button>
                                     </div>
-
                                 ))}
+                                <div className="transaction-detail-actions">
+                                    <button className="btn btn-primary" type="button" onClick={() => this.simpanTransaksi()}>
+                                        Simpan Transaksi
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <br />
-                        <button className=" btn btn-sm btn-outline-dark"
+                        <button className="btn btn-outline-dark transaction-add-package"
+                            type="button"
                             onClick={() => this.addPaket()}>
                             <i class="fas fa-plus"></i> Tambah Paket</button>
 
